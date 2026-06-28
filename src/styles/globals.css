@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #0A0E1A;
+  --color-surface: #111827;
+  --color-border: #1F2937;
+  --color-accent: #00D4AA;
+  --color-bull: #10B981;
+  --color-bear: #EF4444;
+  --color-warn: #F59E0B;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--color-bg);
+  color: #F9FAFB;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+@layer components {
+  .card {
+    @apply bg-surface border border-border rounded-xl p-4;
+  }
+
+  .badge-buy {
+    @apply text-xs font-semibold px-2 py-0.5 rounded-full bg-bull/20 text-bull border border-bull/30;
+  }
+
+  .badge-sell {
+    @apply text-xs font-semibold px-2 py-0.5 rounded-full bg-bear/20 text-bear border border-bear/30;
+  }
+
+  .badge-hold {
+    @apply text-xs font-semibold px-2 py-0.5 rounded-full bg-warn/20 text-warn border border-warn/30;
+  }
+
+  .table-row-hover {
+    @apply hover:bg-white/[0.03] transition-colors cursor-default;
+  }
+
+  .score-bar {
+    @apply h-1.5 rounded-full bg-border overflow-hidden;
+  }
+
+  .score-bar-fill {
+    @apply h-full rounded-full transition-all duration-500;
+  }
+}
