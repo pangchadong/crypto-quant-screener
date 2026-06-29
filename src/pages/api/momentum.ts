@@ -11,11 +11,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       supabaseAdmin.from('market_data').select('symbol, last_price, change_pct_24h').order('timestamp', { ascending: false }).limit(100),
       supabaseAdmin.from('indicators').select('symbol, rsi14, macd, macd_histogram').limit(100),
     ])
-    const mdMap = new Map<string, typeof mdRes.data[0]>()
+
+    const mdMap = new Map<string, { symbol: string; last_price: number; change_pct_24h: number }>()
     for (const md of (mdRes.data || [])) { if (!mdMap.has(md.symbol)) mdMap.set(md.symbol, md) }
-    const indMap = new Map<string, typeof indRes.data[0]>()
+
+    const indMap = new Map<string, { symbol: string; rsi14: number | null; macd: number | null; macd_histogram: number | null }>()
     for (const ind of (indRes.data || [])) { indMap.set(ind.symbol, ind) }
-    const data = (scoresRes.data || []).map(s => ({ ...s, market_data: mdMap.get(s.symbol) || null, indicators: indMap.get(s.symbol) || null }))
+
+    const data = (scoresRes.data || []).map(s => ({
+      ...s,
+      market_data: mdMap.get(s.symbol) || null,
+      indicators: indMap.get(s.symbol) || null,
+    }))
+
     return res.status(200).json({ data, error: null, timestamp: new Date().toISOString() })
   } catch (error) {
     return res.status(200).json({ data: [], error: null, warning: String(error), timestamp: new Date().toISOString() })

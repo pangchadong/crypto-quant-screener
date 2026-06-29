@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       supabaseAdmin.from('market_data').select('symbol, last_price, change_pct_24h, volume').order('timestamp', { ascending: false }).limit(limit * 3),
     ])
 
-    const mdMap = new Map<string, typeof mdRes.data[0]>()
+    const mdMap = new Map<string, { symbol: string; last_price: number; change_pct_24h: number; volume: number }>()
     for (const md of (mdRes.data || [])) { if (!mdMap.has(md.symbol)) mdMap.set(md.symbol, md) }
 
     const data = (scoresRes.data || []).map(s => ({ ...s, market_data: mdMap.get(s.symbol) || null }))

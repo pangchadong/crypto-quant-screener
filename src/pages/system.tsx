@@ -53,6 +53,7 @@ export default function SystemPage() {
     setLoading(false)
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchLogs() }, [filter])
 
   const errorCount = logs.filter(l => l.log_type === 'ERROR').length
