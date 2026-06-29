@@ -17,6 +17,20 @@ interface PriceChartProps {
   color?: string
 }
 
+const CustomTooltip = ({ active, payload, label }: {
+  active?: boolean
+  payload?: Array<{ value: number }>
+  label?: number
+}) => {
+  if (!active || !payload || !payload.length) return null
+  return (
+    <div style={{ background: '#111827', border: '1px solid #1F2937', borderRadius: 8, padding: '6px 10px', fontSize: 12 }}>
+      <p style={{ color: '#6B7280' }}>{label ? format(new Date(label), 'd MMM yyyy', { locale: th }) : ''}</p>
+      <p style={{ color: '#F9FAFB' }}>฿{payload[0].value.toLocaleString('th-TH', { maximumFractionDigits: 4 })}</p>
+    </div>
+  )
+}
+
 export default function PriceChart({ data, color = '#00D4AA' }: PriceChartProps) {
   if (!data || data.length === 0) {
     return (
@@ -43,41 +57,26 @@ export default function PriceChart({ data, color = '#00D4AA' }: PriceChartProps)
         <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
         <XAxis
           dataKey="timestamp"
-          tickFormatter={ts => format(new Date(ts), 'd MMM', { locale: th })}
+          tickFormatter={(ts: number) => format(new Date(ts), 'd MMM', { locale: th })}
           tick={{ fill: '#6B7280', fontSize: 10 }}
-          axisLine={false}
-          tickLine={false}
+          axisLine={false} tickLine={false}
           interval="preserveStartEnd"
         />
         <YAxis
           domain={['auto', 'auto']}
           tick={{ fill: '#6B7280', fontSize: 10 }}
-          axisLine={false}
-          tickLine={false}
-          tickFormatter={v =>
+          axisLine={false} tickLine={false}
+          tickFormatter={(v: number) =>
             v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` :
-            v >= 1000 ? `${(v / 1000).toFixed(0)}K` :
-            v.toFixed(2)
+            v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v.toFixed(2)
           }
           width={55}
         />
-        <Tooltip
-          contentStyle={{
-            background: '#111827',
-            border: '1px solid #1F2937',
-            borderRadius: '8px',
-            fontSize: '12px',
-          }}
-          labelFormatter={ts => format(new Date(ts), 'd MMM yyyy', { locale: th })}
-          formatter={(v: number) => [`฿${v.toLocaleString('th-TH', { maximumFractionDigits: 4 })}`, 'ราคา']}
-        />
+        <Tooltip content={<CustomTooltip />} />
         <Area
-          type="monotone"
-          dataKey="close"
-          stroke={chartColor}
-          strokeWidth={2}
-          fill="url(#priceGrad)"
-          dot={false}
+          type="monotone" dataKey="close"
+          stroke={chartColor} strokeWidth={2}
+          fill="url(#priceGrad)" dot={false}
           activeDot={{ r: 4, fill: chartColor }}
         />
       </AreaChart>
