@@ -1,6 +1,6 @@
 // src/services/scanner.ts
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase'
-import { getAllTickers, getOHLCV, NormalizedTicker } from './bitkub'
+import { getAllTickers, NormalizedTicker } from './bitkub'
 import { calculateIndicators } from './indicators'
 import { calculateScore } from './scoring'
 import { generateSignal } from './signals'
@@ -110,20 +110,9 @@ async function storeMarketData(tickers: NormalizedTicker[]) {
 }
 
 async function processOneCoin(ticker: NormalizedTicker, btcChange: number, coinId: string) {
-  // ลองดึง OHLCV ก่อน (daily candles)
-  let candles = await getOHLCV(ticker.symbol, '1440', 300)
-
-  let indicatorResult
-
-  if (candles.length >= 20) {
-    // มีข้อมูลเพียงพอ — คำนวณ indicators จริง
-    indicatorResult = calculateIndicators(
-      candles.map(c => ({ open: c.open, high: c.high, low: c.low, close: c.close, volume: c.volume }))
-    )
-  } else {
-    // ไม่มีข้อมูล OHLCV — ประมาณค่าจาก 24H data
-    indicatorResult = estimateIndicatorsFromTicker(ticker)
-  }
+  // ใช้ estimated indicators จาก 24H data (เร็ว ไม่ต้องดึง OHLCV)
+  // OHLCV fetch ใช้เวลานานเกินไปสำหรับ 391 เหรียญ
+  const indicatorResult = estimateIndicatorsFromTicker(ticker)
 
   // Upsert indicators
   await supabaseAdmin.from('indicators').upsert({
