@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { runMarketScan } from '@/services/scanner'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // ตรวจสอบ Authorization (ยกเว้น development mode)
   const isDev = process.env.NODE_ENV === 'development'
   const cronSecret = process.env.CRON_SECRET
 
@@ -18,21 +17,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  // ส่ง response กลับทันที ไม่รอ scan เสร็จ
+  res.status(200).json({
+    success: true,
+    message: 'Scan started in background',
+    timestamp: new Date().toISOString(),
+  })
+
+  // รัน scan หลัง response ส่งไปแล้ว
   try {
-    console.log('[SCAN] Starting market scan...')
-    const result = await runMarketScan()
-    return res.status(200).json({
-      success: result.success,
-      processed: result.processed,
-      errors: result.errors,
-      timestamp: new Date().toISOString(),
-    })
+    await runMarketScan()
   } catch (error) {
-    console.error('[SCAN] Error:', error)
-    return res.status(200).json({
-      success: false,
-      error: String(error),
-      timestamp: new Date().toISOString(),
-    })
+    console.error('[SCAN] Background scan failed:', error)
   }
 }
