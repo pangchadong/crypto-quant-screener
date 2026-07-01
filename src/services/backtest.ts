@@ -4,7 +4,7 @@ import { calculateIndicators } from './indicators'
 import { calculateScore } from './scoring'
 import { generateSignal } from './signals'
 import { BacktestResult, BacktestTrade } from '@/types'
-import { v4 as uuidv4 } from 'uuid'
+// uuid replaced with crypto.randomUUID()
 
 interface BacktestParams {
   symbol: string
@@ -157,7 +157,7 @@ export async function runBacktest(params: BacktestParams): Promise<BacktestResul
   const period_start = new Date(now.getTime() - days * 24 * 60 * 60 * 1000).toISOString()
 
   return {
-    id: uuidv4(),
+    id: Math.random().toString(36).substring(2) + Date.now().toString(36),
     strategy_name: 'Quant Screener Strategy',
     symbol,
     period_start,
